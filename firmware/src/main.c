@@ -4,11 +4,33 @@
 #include "gfx_mono_text.h"
 #include "sysfont.h"
 
+// DEFINES
+#define BUZZER_PIO				PIOC
+#define BUZZER_PIO_ID			ID_PIOC
+#define BUZZER_PIO_IDX			19
+#define BUZZER_PIO_IDX_MASK		(1 << BUZZER_PIO_IDX)
+
+
+// FUNCOES
+void set_buzzer(Pio *p_pio, const uint32_t ul_mask){
+	p_pio->PIO_SODR = ul_mask;
+}
+
+void clear_buzzer(Pio *p_pio, const uint32_t ul_mask) {
+	p_pio->PIO_CODR = ul_mask;
+}
+
+
+// MAIN
 int main (void)
 {
 	board_init();
 	sysclk_init();
 	delay_init();
+	pmc_enable_all_periph_clk(BUZZER_PIO_ID);
+	
+	// Define buzzer como output
+	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, PIO_DEFAULT);
 
   // Init OLED
 	gfx_mono_ssd1306_init();
