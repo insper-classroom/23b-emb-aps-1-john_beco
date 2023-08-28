@@ -17,22 +17,37 @@
 #define START_PIO_IDX			28
 #define START_PIO_IDX_MASK		(1 << START_PIO_IDX)
 
+// Selecao
+#define SELECAO_PIO				PIOC
+#define SELECAO_PIO_ID			ID_PIOC
+#define SELECAO_PIO_IDX			31
+#define SELECAO_PIO_IDX_MASK	(1 << SELECAO_PIO_IDX)
+
 
 // FUNCOES
-void set_buzzer(Pio *p_pio, const uint32_t ul_mask){
-	p_pio->PIO_SODR = ul_mask;
+void set_buzzer(){
+	pio_set(BUZZER_PIO, BUZZER_PIO_IDX_MASK);
 }
 
-void clear_buzzer(Pio *p_pio, const uint32_t ul_mask) {
-	p_pio->PIO_CODR = ul_mask;
+void clear_buzzer() {
+	pio_clear(BUZZER_PIO, BUZZER_PIO_IDX_MASK);
 }
 
 int get_startstop(){
 	if (pio_get(START_PIO, PIO_INPUT, START_PIO_IDX_MASK)){
-		return 1;
+		return 0;
 	}
 	else {
+		return 1;
+	}
+}
+
+int get_selecao(){
+	if (pio_get(SELECAO_PIO, PIO_INPUT, SELECAO_PIO_IDX_MASK)){
 		return 0;
+	}
+	else {
+		return 1;
 	}
 }
 
@@ -52,7 +67,12 @@ void init(){
 	
 	// START
 	pmc_enable_all_periph_clk(START_PIO_ID);
-	pio_set_output(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT);
+	pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_PULLUP);
+	
+	// Selecao
+	pmc_enable_all_periph_clk(SELECAO_PIO_ID);
+	pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_PULLUP);
+	
 }
 
 
