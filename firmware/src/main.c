@@ -51,6 +51,18 @@ int get_selecao(){
 	}
 }
 
+void buzzer_test(int freq){
+	int t = 0;
+	t = 1000000/(2*freq);
+	
+	for (int i=0; i<1000000; i++){
+		set_buzzer();
+		delay_us(t);
+		clear_buzzer();
+		delay_us(t);
+	}
+}
+
 
 // INIT
 void init(){
@@ -62,15 +74,15 @@ void init(){
 	WDT->WDT_MR = WDT_MR_WDDIS;
 	
 	// Buzzer
-	pmc_enable_all_periph_clk(BUZZER_PIO_ID);
-	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, PIO_DEFAULT);
+	pmc_enable_periph_clk(BUZZER_PIO_ID);
+	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, 0,0,0);
 	
 	// START
-	pmc_enable_all_periph_clk(START_PIO_ID);
+	pmc_enable_periph_clk(START_PIO_ID);
 	pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_PULLUP);
 	
 	// Selecao
-	pmc_enable_all_periph_clk(SELECAO_PIO_ID);
+	pmc_enable_periph_clk(SELECAO_PIO_ID);
 	pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_PULLUP);
 	
 }
@@ -81,7 +93,7 @@ int main (void)
 {
 	init();
 	
-
+	
   // Init OLED
 	gfx_mono_ssd1306_init();
   
@@ -91,6 +103,7 @@ int main (void)
 
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
-
+		// TESTE
+		buzzer_test(50);
 	}
 }
