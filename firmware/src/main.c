@@ -5,10 +5,17 @@
 #include "sysfont.h"
 
 // DEFINES
+// Buzzer
 #define BUZZER_PIO				PIOC
 #define BUZZER_PIO_ID			ID_PIOC
 #define BUZZER_PIO_IDX			19
 #define BUZZER_PIO_IDX_MASK		(1 << BUZZER_PIO_IDX)
+
+// Button
+#define START_PIO				PIOD
+#define START_PIO_ID			ID_PIOC
+#define START_PIO_IDX			28
+#define START_PIO_IDX_MASK		(1 << START_PIO_IDX)
 
 
 // FUNCOES
@@ -20,17 +27,40 @@ void clear_buzzer(Pio *p_pio, const uint32_t ul_mask) {
 	p_pio->PIO_CODR = ul_mask;
 }
 
+int get_startstop(){
+	if (pio_get(START_PIO, PIO_INPUT, START_PIO_IDX_MASK)){
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+
+// INIT
+void init(){
+	board_init();
+	sysclk_init();
+	delay_init();
+	
+	// Desativa WatchDog Timer
+	WDT->WDT_MR = WDT_MR_WDDIS;
+	
+	// Buzzer
+	pmc_enable_all_periph_clk(BUZZER_PIO_ID);
+	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, PIO_DEFAULT);
+	
+	// START
+	pmc_enable_all_periph_clk(START_PIO_ID);
+	pio_set_output(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT);
+}
+
 
 // MAIN
 int main (void)
 {
-	board_init();
-	sysclk_init();
-	delay_init();
-	pmc_enable_all_periph_clk(BUZZER_PIO_ID);
+	init();
 	
-	// Define buzzer como output
-	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, PIO_DEFAULT);
 
   // Init OLED
 	gfx_mono_ssd1306_init();
