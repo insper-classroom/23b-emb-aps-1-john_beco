@@ -1,5 +1,7 @@
 #include <asf.h>
 
+#include "musica.h"
+
 #include "gfx_mono_ug_2832hsweg04.h"
 #include "gfx_mono_text.h"
 #include "sysfont.h"
@@ -22,6 +24,8 @@
 #define SELECAO_PIO_ID			ID_PIOC
 #define SELECAO_PIO_IDX			31
 #define SELECAO_PIO_IDX_MASK	(1 << SELECAO_PIO_IDX)
+
+// Variaveis Globais
 
 
 // FUNCOES
@@ -76,6 +80,46 @@ void tone(int freq, int duration){
 }
 
 
+void tempo_nota(){
+	int tempo = 200;
+	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
+	// there are two values per note (pitch and duration), so for each note there are four bytes
+	int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+
+	// this calculates the duration of a whole note in ms
+	int wholenote = (60000 * 4) / tempo;
+
+	int divider = 0, noteDuration = 0;
+
+
+	// iterate over the notes of the melody.
+	// Remember, the array is twice the number of notes (notes + durations)
+	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+
+		// calculates the duration of each note
+		divider = melody[thisNote + 1];
+		if (divider > 0) {
+			// regular note, just proceed
+			noteDuration = (wholenote) / divider;
+			} else if (divider < 0) {
+			// dotted notes are represented with negative durations!!
+			noteDuration = (wholenote) / abs(divider);
+			noteDuration *= 1.5; // increases the duration in half for dotted notes
+		}
+
+		// we only play the note for 90% of the duration, leaving 10% as a pause
+		//tone(buzzer, melody[thisNote], noteDuration * 0.9);
+		tone(melody[thisNote],noteDuration * 0.5);
+
+		// Wait for the specief duration before playing the next note.
+		delay_ms(noteDuration);
+
+		// stop the waveform generation before the next note.
+		//noTone(buzzer);
+	}
+}
+
+
 
 // INIT
 void init(){
@@ -117,10 +161,6 @@ int main (void)
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
 		// TESTE
-		for (int freq=200; freq<5000; freq+=500){
-			tone(freq, 200 + freq/2);
-			delay_ms(200);
-		}
-		// buzzer_test(50);
+		tempo_nota();
 	}
 }
