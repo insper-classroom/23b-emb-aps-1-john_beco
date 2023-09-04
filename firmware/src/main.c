@@ -19,13 +19,26 @@
 #define START_PIO_IDX			28
 #define START_PIO_IDX_MASK		(1 << START_PIO_IDX)
 
+#define BUT2_PIO PIOC
+#define BUT2_PIO_ID ID_PIOC
+#define BUT2_PIO_IDX 31
+#define BUT2_PIO_IDX_MASK (1u << BUT2_PIO_IDX)
+
+#define BUT3_PIO PIOA
+#define BUT3_PIO_ID ID_PIOA
+#define BUT3_PIO_IDX 19
+#define BUT3_PIO_IDX_MASK (1u << BUT3_PIO_IDX)
+
 // Selecao
 #define SELECAO_PIO				PIOC
 #define SELECAO_PIO_ID			ID_PIOC
 #define SELECAO_PIO_IDX			31
 #define SELECAO_PIO_IDX_MASK	(1 << SELECAO_PIO_IDX)
 
-// Variaveis Globais
+// GLOBALS
+volatile char butflag1 = 0;
+volatile char butflag2 = 0;
+volatile char butflag3 = 0;
 
 
 // FUNCOES
@@ -79,12 +92,30 @@ void tone(int freq, int duration){
 	}
 }
 
+void but_1(){
+	butflag1 = 1;
+}
 
-void tempo_nota(){
+void but_2(){
+	butflag2 = 1;
+}
+
+void but_3(){
+	butflag3 = 1;
+}
+
+
+void musica(int escolha){
+	int musicas[1][3] = {
+		{melody}, {melody_harrypotter}, {melody_starwars}
+	};
+
+
+
 	int tempo = 200;
 	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
-	int notes = sizeof(melody) / sizeof(melody[0]) / 2;
+	int notes = sizeof(musicas) / sizeof(musicas[0]) / 2;
 
 	// this calculates the duration of a whole note in ms
 	int wholenote = (60000 * 4) / tempo;
@@ -92,12 +123,12 @@ void tempo_nota(){
 	int divider = 0, noteDuration = 0;
 
 
-	// iterate over the notes of the melody.
+	// iterate over the notes of the musicas.
 	// Remember, the array is twice the number of notes (notes + durations)
 	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 
 		// calculates the duration of each note
-		divider = melody[thisNote + 1];
+		divider = musicas[thisNote + 1];
 		if (divider > 0) {
 			// regular note, just proceed
 			noteDuration = (wholenote) / divider;
@@ -108,8 +139,8 @@ void tempo_nota(){
 		}
 
 		// we only play the note for 90% of the duration, leaving 10% as a pause
-		//tone(buzzer, melody[thisNote], noteDuration * 0.9);
-		tone(melody[thisNote],noteDuration * 0.5);
+		//tone(buzzer, musicas[thisNote], noteDuration * 0.9);
+		tone(musicas[thisNote],noteDuration * 0.5);
 
 		// Wait for the specief duration before playing the next note.
 		delay_ms(noteDuration);
@@ -137,10 +168,57 @@ void init(){
 	// START
 	pmc_enable_periph_clk(START_PIO_ID);
 	pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_PULLUP);
+
+	pmc_enable_periph_clk(BUT2_PIO);
+	pio_set_input(BUT2_PIO, BUT2_PIO_IDX_MASK, PIO_PULLUP);
+
+	pmc_enable_periph_clk(BUT3_PIO);
+	pio_set_input(BUT3_PIO, BUT3_PIO_IDX_MASK, PIO_PULLUP);
 	
 	// Selecao
 	pmc_enable_periph_clk(SELECAO_PIO_ID);
 	pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_PULLUP);
+
+	pio_handler_set(
+		START_PIO,
+		START_PIO_ID,
+		START_PIO_IDX_MASK,
+		PIO_IT_RISE_EDGE,
+		but_1);
+
+	pio_handler_set(
+		BUT2_PIO,
+		BUT2_PIO_ID,
+		BUT2_PIO_IDX_MASK,
+		PIO_IT_EDGE,
+		but_2);
+
+	pio_handler_set(
+		BUT3_PIO,
+		BUT3_PIO_ID,
+		BUT3_PIO_IDX_MASK,
+		PIO_IT_RISE_EDGE,
+		but_3);
+
+
+// Ativa interrupção e limpa primeira IRQ gerada na ativacao
+	pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
+	pio_enable_interrupt(BUT2_PIO, BUT2_PIO_IDX_MASK);
+	pio_enable_interrupt(BUT3_PIO, BUT3_PIO_IDX_MASK);
+
+	pio_get_interrupt_status(START_PIO);
+	pio_get_interrupt_status(BUT2_PIO);
+	pio_get_interrupt_status(BUT3_PIO);
+	
+	// Configura NVIC para receber interrupcoes do PIO do botao
+	// com prioridade 4 (quanto mais próximo de 0 maior)
+	NVIC_EnableIRQ(START_PIO_ID);
+	NVIC_EnableIRQ(BUT2_PIO_ID);
+	NVIC_EnableIRQ(BUT3_PIO_ID);
+	
+	NVIC_SetPriority(START_PIO_ID, 4);
+	NVIC_SetPriority(BUT2_PIO_ID, 4);
+	NVIC_SetPriority(BUT3_PIO_ID, 4); // Prioridade 4
 	
 }
 
@@ -148,19 +226,42 @@ void init(){
 // MAIN
 int main (void)
 {
+	int escolha = 0;
+	char nome_musicas[1][3] = {
+		{"Super Mario Bros"}, {"Harry Potter"}, {"Star Wars"}
+	};
+	char buffer[128];
+	buffer[0] = '\0';
+	int toca = 0;
+
+
 	init();
-	
-	
+
   // Init OLED
 	gfx_mono_ssd1306_init();
   
   // Escreve na tela um circulo e um texto
 	gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-  gfx_mono_draw_string("mundo", 50,16, &sysfont);
+  
 
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
 		// TESTE
-		tempo_nota();
+		if(butflag2 == 1){
+			escolha++;
+			butflag2 = 0;
+		}
+		if(butflag3 == 1){
+			escolha--;
+			butflag3 = 0;
+		}
+		sprintf(buffer, "%c ", nome_musicas[escolha]);
+		gfx_mono_draw_string(buffer, 0, 16, &sysfont);
+
+		if(butflag1 && toca == 0){
+			musica(escolha);
+			toca = !toca;
+		}
+
 	}
 }
