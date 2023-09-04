@@ -63,6 +63,19 @@ void buzzer_test(int freq){
 	}
 }
 
+void tone(int freq, int duration){
+	int t = 0;
+	t = ((int)1000000)/((int)(2*freq));
+	
+	for (int i=0; i<duration; i++){
+		set_buzzer();
+		delay_us(t);
+		clear_buzzer();
+		delay_us(t);
+	}
+}
+
+
 
 // INIT
 void init(){
@@ -104,6 +117,10 @@ int main (void)
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
 		// TESTE
-		buzzer_test(50);
+		for (int freq=200; freq<5000; freq+=500){
+			tone(freq, 200 + freq/2);
+			delay_ms(200);
+		}
+		// buzzer_test(50);
 	}
 }
