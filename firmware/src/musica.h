@@ -1,3 +1,15 @@
+// melodies.h
+
+#ifndef MELODIES_H
+#define MELODIES_H
+
+extern int melody[];
+extern int melody_harrypotter[];
+extern int melody_starwars[];
+
+#endif // MELODIES_H
+
+
 // Define notas musicais
 #define NOTE_B0  31
 #define NOTE_C1  33

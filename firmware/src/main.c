@@ -1,4 +1,6 @@
 #include <asf.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "musica.h"
 
@@ -15,7 +17,7 @@
 
 // Button
 #define START_PIO				PIOD
-#define START_PIO_ID			ID_PIOC
+#define START_PIO_ID			ID_PIOD
 #define START_PIO_IDX			28
 #define START_PIO_IDX_MASK		(1 << START_PIO_IDX)
 
@@ -34,6 +36,7 @@
 volatile char butflag1 = 0;
 volatile char butflag2 = 0;
 volatile char butflag3 = 0;
+
 
 
 // FUNCOES
@@ -77,7 +80,12 @@ void buzzer_test(int freq){
 
 void tone(int freq, int duration){
 	int t = 0;
+	if(freq == 0){
+		delay_ms(duration);
+	}
+	else{
 	t = ((int)1000000)/((int)(2*freq));
+	}
 	
 	for (int i=0; i<duration; i++){
 		set_buzzer();
@@ -100,60 +108,71 @@ void but_3(){
 }
 
 
-void musica(int escolha){
-	int melodia[1000];
-	melodia[0] = '\0';
-
-	int melodies[1][3] = {
-		{
-		melody	
-		},
-		{
-		melody_harrypotter
-		},
-		{
-		melody_starwars	
-		}
-	};
- 
-	 for(int i=0; i<sizeof(melodies[escolha]); i++){
-	  melodia[i] = melodies[escolha][i];
-	 }
+void musica(int escolha) {
+	int *melodia = NULL; // Initialize the pointer
+	int notes = 0;
 	int tempo = 200;
-	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-	// there are two values per note (pitch and duration), so for each note there are four bytes
-	int notes = sizeof(melodia) / sizeof(melodia[0]) / 2;
-
-	// this calculates the duration of a whole note in ms
 	int wholenote = (60000 * 4) / tempo;
+	
+	char buffer[128] = "NULL"; 
+
+	// Select the melody based on escolha
+	if (escolha == 0) {
+		melodia = melody;
+		notes = sizeof(melody) / sizeof(melody[0]) / 2;
+		// strcpy(buffer, "Super Mario Bros");
+		} else if (escolha == 1) {
+		melodia = melody_harrypotter;
+		notes = sizeof(melody_harrypotter) / sizeof(melody_harrypotter[0]) / 2;
+		// strcpy(buffer, "Harry Potter");
+		} else if (escolha == 2) {
+		melodia = melody_starwars;
+		notes = sizeof(melody_starwars) / sizeof(melody_starwars[0]) / 2;
+		// strcpy(buffer, "Star Wars");
+		} else {
+		// Handle an invalid escolha value here (e.g., print an error message)
+		return;
+	}
+	// gfx_mono_draw_string(buffer, 0, 16, &sysfont);
 
 	int divider = 0, noteDuration = 0;
-
-
-	// iterate over the notes of the melody.
-	// Remember, the array is twice the number of notes (notes + durations)
+	
 	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-
-		// calculates the duration of each note
-		divider = melodia[thisNote + 1];
-		if (divider > 0) {
-			// regular note, just proceed
-			noteDuration = (wholenote) / divider;
-			} else if (divider < 0) {
-			// dotted notes are represented with negative durations!!
-			noteDuration = (wholenote) / abs(divider);
-			noteDuration *= 1.5; // increases the duration in half for dotted notes
+		if(butflag3 == 1){
+			int apertou = 1;
+			butflag3 = 0;
+			while(apertou == 1){
+				if(butflag3 == 1){
+					butflag3 = 0;
+					apertou = 0;
+				}
+			}
 		}
 
-		// we only play the note for 90% of the duration, leaving 10% as a pause
-		//tone(buzzer, melody[thisNote], noteDuration * 0.9);
-		tone(melodia[thisNote],noteDuration * 0.5);
+		if(butflag2 == 1){
+			if(escolha == 2){
+				escolha = 0;
+			}
+			else{
+				escolha++;
+			}
+			butflag2 = 0;
 
-		// Wait for the specief duration before playing the next note.
-		delay_ms(noteDuration);
+			musica(escolha);
+			return;
+		}
 
-		// stop the waveform generation before the next note.
-		//noTone(buzzer);
+		divider = melodia[thisNote + 1];		
+
+		if (divider > 0) {
+			noteDuration = (wholenote) / divider;
+			} else if (divider < 0) {
+			noteDuration = (wholenote) / abs(divider);
+			noteDuration *= 1.5;
+		}
+
+		tone(melodia[thisNote],noteDuration * 0.9);
+		delay_ms(noteDuration*0.1);
 	}
 }
 
@@ -175,36 +194,34 @@ void init(){
 	// START
 	pmc_enable_periph_clk(START_PIO_ID);
 	pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_PULLUP);
-
-
 	
 	// Selecao
 	pmc_enable_periph_clk(SELECAO_PIO_ID);
 	pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_PULLUP);
 
 	pio_handler_set(
-		START_PIO,
-		START_PIO_ID,
-		START_PIO_IDX_MASK,
-		PIO_IT_RISE_EDGE,
-		but_1);
+	START_PIO,
+	START_PIO_ID,
+	START_PIO_IDX_MASK,
+	PIO_IT_RISE_EDGE,
+	but_1);
 
 	pio_handler_set(
-		SELECAO_PIO,
-		SELECAO_PIO_ID,
-		SELECAO_PIO_IDX_MASK,
-		PIO_IT_EDGE,
-		but_2);
+	SELECAO_PIO,
+	SELECAO_PIO_ID,
+	SELECAO_PIO_IDX_MASK,
+	PIO_IT_EDGE,
+	but_2);
 
 	pio_handler_set(
-		BUT3_PIO,
-		BUT3_PIO_ID,
-		BUT3_PIO_IDX_MASK,
-		PIO_IT_RISE_EDGE,
-		but_3);
+	BUT3_PIO,
+	BUT3_PIO_ID,
+	BUT3_PIO_IDX_MASK,
+	PIO_IT_RISE_EDGE,
+	but_3);
 
 
-// Ativa interrupção e limpa primeira IRQ gerada na ativacao
+	// Ativa interrupção e limpa primeira IRQ gerada na ativacao
 	pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
 	pio_enable_interrupt(SELECAO_PIO, SELECAO_PIO_IDX_MASK);
 	pio_enable_interrupt(BUT3_PIO, BUT3_PIO_IDX_MASK);
@@ -230,44 +247,28 @@ void init(){
 int main (void)
 {
 	int escolha = 0;
-	char nome_musicas[1][3] = {
+	char nome_musicas[3] = {
 		{"Super Mario Bros"}, {"Harry Potter"}, {"Star Wars"}
 	};
-	char buffer[128];
-	buffer[0] = '\0';
-	//int toca = 0;
+	
+	int toca = 0;
 
 
 	init();
 
-  // Init OLED
+	// Init OLED
 	gfx_mono_ssd1306_init();
-  
-  // Escreve na tela um circulo e um texto
+	// gfx_mono_draw_string("Aperte o botao", 0, 0, &sysfont);
+	// Escreve na tela um circulo e um texto
 	//gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-  
+	
 
-  /* Insert application code here, after the board has been initialized. */
+	/* Insert application code here, after the board has been initialized. */
 	while(1) {
-		// TESTE
-		//if(butflag2 == 1){
-			//escolha++;
-			//butflag2 = 0;
-			//sprintf(buffer, "%s ", nome_musicas[escolha]);
-		//}
-		//if(butflag3 == 1){
-			//escolha--;
-			//butflag3 = 0;
-			//sprintf(buffer, "%s ", nome_musicas[escolha]);
-		//}
-		//
-		//gfx_mono_draw_string(buffer, 0, 16, &sysfont);
-//
-		//if(butflag1){
-			//musica(escolha);
-			////toca = !toca;
-		//}
-		musica(1);
-
+		 		
+		if(butflag1){
+			musica(2);
+			//toca = !toca;
+		}
 	}
 }
