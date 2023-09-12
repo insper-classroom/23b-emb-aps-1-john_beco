@@ -29,7 +29,7 @@
 #define SELECAO_PIO				PIOC
 #define SELECAO_PIO_ID			ID_PIOC
 #define SELECAO_PIO_IDX			31
-#define SELECAO_PIO_IDX_MASK	((UINT32_C)(1 << SELECAO_PIO_IDX))
+#define SELECAO_PIO_IDX_MASK	((uint32_t)(1 << SELECAO_PIO_IDX))
 
 // GLOBALS
 volatile char butflag1 = 0;
