@@ -1,5 +1,4 @@
 #include <asf.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "musica.h"
@@ -112,28 +111,44 @@ void musica(int escolha) {
 	int *melodia = NULL; // Initialize the pointer
 	int notes = 0;
 	int tempo = 200;
-	int wholenote = (60000 * 4) / tempo;
 	
-	char buffer[128] = "NULL"; 
+	char buffer[32];
+	for (int i =0; i < 32; i++)
+	{
+		buffer[i] = ' ';
+	}
+	buffer[31] = '\0'; 
+	gfx_mono_draw_string(buffer, 0, 0, &sysfont);
 
 	// Select the melody based on escolha
 	if (escolha == 0) {
+		tempo = 156;
 		melodia = melody;
 		notes = sizeof(melody) / sizeof(melody[0]) / 2;
-		// strcpy(buffer, "Super Mario Bros");
-		} else if (escolha == 1) {
+		strcpy(buffer, "Super Mario");
+	} else if (escolha == 1) {
+		tempo = 314;
 		melodia = melody_harrypotter;
 		notes = sizeof(melody_harrypotter) / sizeof(melody_harrypotter[0]) / 2;
-		// strcpy(buffer, "Harry Potter");
-		} else if (escolha == 2) {
+		strcpy(buffer, "Harry Potter");
+	} else if (escolha == 2) {
 		melodia = melody_starwars;
 		notes = sizeof(melody_starwars) / sizeof(melody_starwars[0]) / 2;
-		// strcpy(buffer, "Star Wars");
-		} else {
+		strcpy(buffer, "Star Wars");
+	} else if (escolha == 3){
+		tempo = 175;
+		melodia = melody_nggyu;
+		notes = sizeof(melody_nggyu) / sizeof(melody_nggyu[0]) / 2;
+		strcpy(buffer, "Never...");
+	}
+	else{
 		// Handle an invalid escolha value here (e.g., print an error message)
+		strcpy(buffer, "");
 		return;
 	}
-	// gfx_mono_draw_string(buffer, 0, 16, &sysfont);
+
+	gfx_mono_draw_string(buffer, 0, 0, &sysfont);
+	int wholenote = (60000 * 4) / tempo;
 
 	int divider = 0, noteDuration = 0;
 	
@@ -150,12 +165,8 @@ void musica(int escolha) {
 		}
 
 		if(butflag2 == 1){
-			if(escolha == 2){
-				escolha = 0;
-			}
-			else{
-				escolha++;
-			}
+			escolha = ++escolha % 4;
+
 			butflag2 = 0;
 
 			musica(escolha);
