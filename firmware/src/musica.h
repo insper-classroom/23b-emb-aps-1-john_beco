@@ -1,4 +1,4 @@
-// melodies.h
+// musica.h
 
 #ifndef MUSICA_H
 #define MUSICA_H
@@ -7,8 +7,6 @@ extern int melody[];
 extern int melody_harrypotter[];
 extern int melody_starwars[];
 extern int melody_nggyu[];
-
-
 
 // Define notas musicais
 #define NOTE_B0  31
@@ -101,9 +99,6 @@ extern int melody_nggyu[];
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 #define REST      0
-
-#endif // MELODIES_H
-
 
 int melody[] = {
 
@@ -342,3 +337,4 @@ int melody_harrypotter[] = {
   NOTE_G4, -1, 
   
 };
+#endif // MUSICA_H
