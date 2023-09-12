@@ -1,7 +1,9 @@
 #include <asf.h>
 #include <string.h>
 
+#ifndef MUSICA_H
 #include "musica.h"
+#endif
 
 #include "gfx_mono_ug_2832hsweg04.h"
 #include "gfx_mono_text.h"
