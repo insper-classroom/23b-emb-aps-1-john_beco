@@ -262,9 +262,6 @@ void init(){
 // MAIN
 int main (void)
 {
-	int escolha = 0;
-
-
 	init();
 
 	// Init OLED
