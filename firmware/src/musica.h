@@ -1,7 +1,7 @@
 // melodies.h
 
-#ifndef MELODIES_H
-#define MELODIES_H
+#ifndef MUSICA_H
+#define MUSICA_H
 
 extern int melody[];
 extern int melody_harrypotter[];
