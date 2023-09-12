@@ -8,7 +8,6 @@ extern int melody_harrypotter[];
 extern int melody_starwars[];
 extern int melody_nggyu[];
 
-#endif // MELODIES_H
 
 
 // Define notas musicais
@@ -102,6 +101,9 @@ extern int melody_nggyu[];
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 #define REST      0
+
+#endif // MELODIES_H
+
 
 int melody[] = {
 
