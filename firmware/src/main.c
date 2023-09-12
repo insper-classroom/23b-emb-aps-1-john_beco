@@ -165,7 +165,12 @@ void musica(int escolha) {
 		}
 
 		if(butflag2 == 1){
-			escolha = ++escolha % 4;
+			if(escolha == 3){
+				escolha = 0;
+			}
+			else{
+				escolha++;
+			}
 
 			butflag2 = 0;
 
