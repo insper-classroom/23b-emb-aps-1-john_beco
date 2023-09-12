@@ -150,7 +150,7 @@ void musica(int escolha) {
 	gfx_mono_draw_string(buffer, 0, 0, &sysfont);
 	int wholenote = (60000 * 4) / tempo;
 
-	int divider = 0, noteDuration = 0;
+	int noteDuration = 0;
 	
 	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 		if(butflag3 == 1){
@@ -173,7 +173,7 @@ void musica(int escolha) {
 			return;
 		}
 
-		divider = melodia[thisNote + 1];		
+		int divider = melodia[thisNote + 1];		
 
 		if (divider > 0) {
 			noteDuration = (wholenote) / divider;
@@ -258,11 +258,6 @@ void init(){
 int main (void)
 {
 	int escolha = 0;
-	char nome_musicas[3] = {
-		{"Super Mario Bros"}, {"Harry Potter"}, {"Star Wars"}
-	};
-	
-	int toca = 0;
 
 
 	init();
