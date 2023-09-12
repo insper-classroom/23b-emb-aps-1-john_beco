@@ -1,11 +1,9 @@
 #include <asf.h>
 #include <string.h>
-
-#include "musica.h"
-
 #include "gfx_mono_ug_2832hsweg04.h"
 #include "gfx_mono_text.h"
 #include "sysfont.h"
+#include "musica.h"
 
 // DEFINES
 // Buzzer
@@ -35,7 +33,6 @@
 volatile char butflag1 = 0;
 volatile char butflag2 = 0;
 volatile char butflag3 = 0;
-
 
 
 // FUNCOES

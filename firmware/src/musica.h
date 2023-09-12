@@ -3,10 +3,10 @@
 #ifndef MUSICA_H
 #define MUSICA_H
 
-extern int melody[];
-extern int melody_harrypotter[];
-extern int melody_starwars[];
-extern int melody_nggyu[];
+//extern int melody[];
+//extern int melody_harrypotter[];
+//extern int melody_starwars[];
+//extern int melody_nggyu[];
 
 // Define notas musicais
 #define NOTE_B0  31
