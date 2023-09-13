@@ -138,6 +138,18 @@ void musica(int escolha) {
 		notes = sizeof(melody_nggyu) / sizeof(melody_nggyu[0]) / 2;
 		strcpy(buffer, "Never...");
 	}
+	else if (escolha == 4){
+		tempo = 260;
+		melodia = melody_tetris;
+		notes = sizeof(melody_tetris) / sizeof(melody_tetris[0]) / 2;
+		strcpy(buffer, "TETRIS");
+	}
+		else if (escolha == 5){
+			tempo = 600;
+			melodia = melody_cantina;
+			notes = sizeof(melody_cantina) / sizeof(melody_cantina[0]) / 2;
+			strcpy(buffer, "Cantina");
+		}
 	else{
 		// Handle an invalid escolha value here (e.g., print an error message)
 		strcpy(buffer, "");
@@ -162,28 +174,23 @@ void musica(int escolha) {
 		}
 
 		if(butflag2 == 1){
-			if(escolha == 3){
+			if(escolha == 5){
 				escolha = 0;
 			}
 			else{
 				escolha++;
 			}
-
 			butflag2 = 0;
-
 			musica(escolha);
 			return;
 		}
-
 		int divider = melodia[thisNote + 1];		
-
 		if (divider > 0) {
 			noteDuration = (wholenote) / divider;
 			} else if (divider < 0) {
 			noteDuration = (wholenote) / abs(divider);
 			noteDuration *= 1.5;
 		}
-
 		tone(melodia[thisNote],noteDuration * 0.9);
 		delay_ms(noteDuration*0.1);
 	}
@@ -223,7 +230,7 @@ void init(){
 	SELECAO_PIO,
 	SELECAO_PIO_ID,
 	SELECAO_PIO_IDX_MASK,
-	PIO_IT_EDGE,
+	PIO_IT_RISE_EDGE,
 	but_2);
 
 	pio_handler_set(
