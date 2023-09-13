@@ -26,8 +26,17 @@ TODO: Inserir imagem do sistema montado
 
 ### Vídeo do projeto
 
-TODO: Inserir link para vídeo do projeto funcionando
+[Link para o video](https://www.youtube.com/watch?v=uaw04-q5nhI)
 
 ### Músicas e Direitos autorais
 
-TODO: Listar músicas e dar crédio da onde saiu:
+Músicas usadas:
+
+Todas as musicas foram retiradas [desse repositorio](https://github.com/robsoncouto/arduino-songs/tree/3b8ed10f644cb150bc3fe39c854546f5b9331f71)
+
+- Super Mario Bros Theme - Koji Kondo
+- Hedwig's Theme - John Williams
+- Star Wars Main Title - John Williams
+- Never Gonna Give You Up - Rick Astley
+- Tetris Theme - Hirokazu Tanaka
+- Star Wars Cantina Band - John Williams
