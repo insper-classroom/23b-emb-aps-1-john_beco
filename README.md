@@ -22,7 +22,8 @@ TODO: Aualizar pinos
 
 ### Imagem da montagem
 
-TODO: Inserir imagem do sistema montado
+![APS_1](https://github.com/insper-classroom/23b-emb-aps-1-john_beco/assets/81189216/87bbbb79-43bf-4abe-a1e6-4dc20c33287a)
+
 
 ### Vídeo do projeto
 
