@@ -81,14 +81,16 @@ void tone(int freq, int duration){
 	}
 	else{
 	t = ((int)1000000)/((int)(2*freq));
+	int duracao_em_clocks = ((int)duration/300000000)
+		for (int i=0; i<duracao_em_clocks; i++){
+			set_buzzer();
+			delay_us(t);
+			clear_buzzer();
+			delay_us(t);
+		}
 	}
 	
-	for (int i=0; i<duration; i++){
-		set_buzzer();
-		delay_us(t);
-		clear_buzzer();
-		delay_us(t);
-	}
+
 }
 
 void but_1(){
